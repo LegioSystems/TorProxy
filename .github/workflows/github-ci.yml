@@ -5,11 +5,12 @@ on:
     branches: [ "master" ]
 
 env:
-  # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
   # github.repository as <account>/<repo>
   IMAGE_NAME: ${{ github.repository }}
-  
+  TEST_PORT: 9129
+  PROD_PORT: 9128
+  IS_MASTER: ${{ github.ref_name == 'master' }}
 
 jobs:
   build_and_push:
@@ -59,9 +60,23 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           
+      - name: Docker container configuration
+        run: |
+          if [[ "${{ env.IS_MASTER }} ]]
+          
       - name: Pull container from registry
         run: |
           image_name=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
-          docker pull ${image_name,,}
-          docker images
+          image_name=${image_name,,}
+          docker pull $image_name
+          
+      - name: Remove existing container
+        run: |
+          docker stop $image_name
+          docker rm $image_name
+          
+      - name: Run container
+        run: |
+          docker run -name $image_name $image_name
+          
     

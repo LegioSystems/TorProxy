@@ -36,14 +36,14 @@ jobs:
       - name: Set image tag for master branch
         if: github.ref_name == 'master'
         run: |
-          DOCKER_IMAGE_TAG=latest
-          echo $DOCKER_IMAGE_TAG
+          echo "DOCKER_IMAGE_TAG=latest" >> $GITHUB_ENV
+          echo ${{ env.DOCKER_IMAGE_TAG }}
           
       - name: Set image tag for other branches
         if: github.ref_name != 'master'
         run: |
-          DOCKER_IMAGE_TAG=${{ github.ref_name }}
-          echo $DOCKER_IMAGE_TAG
+          echo "DOCKER_IMAGE_TAG=${{ github.ref_name }}" >> $GITHUB_ENC
+          echo ${{ env.DOCKER_IMAGE_TAG }}
         
 
       # Build and push Docker image with Buildx (don't push on PR)

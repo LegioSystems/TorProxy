@@ -72,7 +72,8 @@ jobs:
           
       - name: Remove existing container
         run: |
-          if [[ ${docker container inspect ${{env.image_name}} } ]]; then
+          existing=${docker container inspect ${{env.image_name}}}
+          if [[ existing ]]; then
             docker stop ${{ env.image_name }}
             docker rm ${{ env.image_name }}
           fi

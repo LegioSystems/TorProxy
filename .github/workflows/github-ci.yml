@@ -68,7 +68,7 @@ jobs:
           
       - name: Remove existing container
         run: |
-          docker stop $image_name
+          docker stop container $image_name
           docker rm $image_name
           
       - name: Run container

@@ -37,12 +37,13 @@ jobs:
         if: github.ref_name == 'master'
         run: |
           echo "DOCKER_IMAGE_TAG=latest" >> $GITHUB_ENV
-          echo ${{ env.DOCKER_IMAGE_TAG }}
+          echo "${{ env.DOCKER_IMAGE_TAG }}"
+          echo $GITHUB_ENV
           
       - name: Set image tag for other branches
         if: github.ref_name != 'master'
         run: |
-          echo "DOCKER_IMAGE_TAG=${{ github.ref_name }}" >> $GITHUB_ENC
+          echo "DOCKER_IMAGE_TAG=${{ github.ref_name }}" >> $GITHUB_ENV
           echo ${{ env.DOCKER_IMAGE_TAG }}
         
 

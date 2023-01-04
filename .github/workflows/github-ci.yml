@@ -56,7 +56,7 @@ jobs:
           image_name=${{ env.REGISTRY }}/${{ github.repository }}:${{ github.ref_name }}
           echo "image_name=${image_name,,}" >> ${GITHUB_ENV}
           container_name=${{ github.repository }}
-          container_name=${conainer_name##*/}
+          container_name=${container_name##*/}
           echo $container_name
           
       - name: Log into registry ${{ env.REGISTRY }}

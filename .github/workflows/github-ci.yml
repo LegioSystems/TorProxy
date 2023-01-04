@@ -31,21 +31,7 @@ jobs:
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Set image tag for master branch
-        if: github.ref_name == 'master'
-        run: |
-          echo "DOCKER_IMAGE_TAG=latest" >> $GITHUB_ENV
-          echo "${{ env.DOCKER_IMAGE_TAG }}"
-          echo $GITHUB_ENV
-          
-      - name: Set image tag for other branches
-        if: github.ref_name != 'master'
-        run: |
-          echo "DOCKER_IMAGE_TAG=${{ github.ref_name }}" >> $GITHUB_ENV
-          echo ${{ env.DOCKER_IMAGE_TAG }}
-        
+          password: ${{ secrets.GITHUB_TOKEN }}      
 
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
@@ -56,8 +42,7 @@ jobs:
           context: .
           file: ./LegioSystems.TorProxy/Dockerfile
           push: true
-          tags: ${{ env.DOCKER_IMAGE_TAG }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ github.ref_name }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 

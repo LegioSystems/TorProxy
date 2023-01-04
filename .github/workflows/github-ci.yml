@@ -58,7 +58,7 @@ jobs:
           container_name=${{ github.repository }}
           container_name=${container_name##*/}
           if [[ !IS_MASTER ]]; then
-            container_name="$container_name.test"
+            container_name="${container_name}.test"
           echo "container_name=$container_name" >> ${GITHUB_ENV}
           
       - name: Log into registry ${{ env.REGISTRY }}

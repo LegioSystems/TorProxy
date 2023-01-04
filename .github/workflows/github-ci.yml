@@ -36,13 +36,13 @@ jobs:
       - name: Set image tag for master branch
         if: github.ref_name == 'master'
         run: |
-          echo "DOCKER_IMAGE_TAG=latest"
+          DOCKER_IMAGE_TAG=latest
           echo $DOCKER_IMAGE_TAG
           
-      - name: Set image tag for master branch
+      - name: Set image tag for other branches
         if: github.ref_name != 'master'
         run: |
-          echo "DOCKER_IMAGE_TAG=${{ github.ref_name }}"
+          DOCKER_IMAGE_TAG=${{ github.ref_name }}
           echo $DOCKER_IMAGE_TAG
         
 
@@ -55,7 +55,7 @@ jobs:
           context: .
           file: ./LegioSystems.TorProxy/Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: ${{ env.DOCKER_IMAGE_TAG }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

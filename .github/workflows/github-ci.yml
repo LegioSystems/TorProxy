@@ -53,6 +53,11 @@ jobs:
   deploy:
     runs-on: self-hosted
     steps:
+      - name: Set environment variables
+        run: |
+          image_name=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
+          echo "image_name=${image_name,,}" >> ${GITHUB_ENV}
+          
       - name: Log into registry ${{ env.REGISTRY }}
         uses: docker/login-action@28218f9b04b4f3f62068d7b6ce6ca5b26e35336c
         with:
@@ -62,10 +67,8 @@ jobs:
           
       - name: Pull container from registry
         run: |
-          image_name=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
-          echo "image_name=${image_name,,}" >> ${GITHUB_ENV}
-          cat $GITHUB_ENV
-          docker pull ${image_name}
+          echo ${{ env.image_name }}
+          docker pull ${{ env.image_name }}
           
       - name: Remove existing container
         run: |

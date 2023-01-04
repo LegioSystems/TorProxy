@@ -11,7 +11,7 @@ env:
   IS_MASTER: ${{ github.ref_name == 'master' }}
 
 jobs:
-  build_and_push:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -50,6 +50,7 @@ jobs:
 
   deploy:
     runs-on: self-hosted
+    needs: build
     steps:
       - name: Set environment variables
         run: |
@@ -82,6 +83,6 @@ jobs:
           
       - name: Run container
         run: |
-          docker run --name ${{ env.container_name }} ${{ env.image_name }}
+          docker run -d --name ${{ env.container_name }} ${{ env.image_name }}
           
     

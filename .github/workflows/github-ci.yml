@@ -57,7 +57,9 @@ jobs:
           echo "image_name=${image_name,,}" >> ${GITHUB_ENV}
           container_name=${{ github.repository }}
           container_name=${container_name##*/}
-          echo $container_name
+          if [[ !IS_MASTER ]]; then
+            container_name="$container_name.test"
+          echo "container_name=$container_name" >> ${GITHUB_ENV}
           
       - name: Log into registry ${{ env.REGISTRY }}
         uses: docker/login-action@28218f9b04b4f3f62068d7b6ce6ca5b26e35336c
@@ -73,12 +75,12 @@ jobs:
           
       - name: Remove existing container
         run: |
-          docker stop ${{ env.image_name }} || true
-          docker rm ${{ env.image_name }} || true
+          docker stop ${{ env.container_name }} || true
+          docker rm ${{ env.container_name }} || true
           
           
       - name: Run container
         run: |
-          docker run --name ${{ env.image_name }} ${{ env.image_name }}
+          docker run --name ${{ env.container_name }} ${{ env.image_name }}
           
     

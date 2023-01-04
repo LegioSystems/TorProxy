@@ -78,6 +78,6 @@ jobs:
           
       - name: Run container
         run: |
-          docker run -name ${{ env.image_name }} ${{ env.image_name }}
+          docker run --name ${{ env.image_name }} ${{ env.image_name }}
           
     

@@ -62,6 +62,6 @@ jobs:
       - name: Pull container from registry
         run: |
           image_name=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
-          docker pull ${image_name2,,}
+          docker pull ${image_name,,}
           docker images
     

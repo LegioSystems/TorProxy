@@ -6,9 +6,9 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  TEST_PORT: 9129
-  PROD_PORT: 9128
-  IS_MASTER: ${{ github.ref_name == 'master' }}
+  #CONTAINER:HOST
+  TEST_PORT_MAPPING: "-p 3128:9130 -p 80:9131"
+  PROD_PORT_MAPPING: "-p 3128:9128 -p 80:9129"
 
 jobs:
   build:
@@ -52,14 +52,18 @@ jobs:
     runs-on: self-hosted
     needs: build
     steps:
-      - name: Set environment variables
+      - name: Prepare container configuration
         run: |
           image_name=${{ env.REGISTRY }}/${{ github.repository }}:${{ github.ref_name }}
           echo "image_name=${image_name,,}" >> ${GITHUB_ENV}
           container_name=${{ github.repository }}
           container_name=${container_name##*/}
-          if [[ !IS_MASTER ]]; then
+          if [[ ${{ github.ref_name }} != 'master' ]]; then
             container_name="${container_name}.test"
+            echo "port_mapping=${{ env.TEST_PORT_MAPPING }}" >> ${GITHUB_ENV}
+          else
+            echo "port_mapping=${{ env.PROD_PORT_MAPPING }}" >> ${GITHUB_ENV}
+            echo "restart_policy=--restart unless-stopped" >> ${GITHUB_ENV}
           fi
           echo "container_name=$container_name" >> ${GITHUB_ENV}
           
@@ -70,7 +74,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           
-      - name: Pull container from registry
+      - name: Pull image from registry
         run: |
           echo ${{ env.image_name }}
           docker pull ${{ env.image_name }}
@@ -83,6 +87,6 @@ jobs:
           
       - name: Run container
         run: |
-          docker run -d --name ${{ env.container_name }} ${{ env.image_name }}
+          docker run -d --name ${{ env.container_name }} ${{ env.port_mapping }} ${{ env.restart_policy }} ${{ env.image_name }}
           
     

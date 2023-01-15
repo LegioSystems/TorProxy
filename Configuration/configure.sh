@@ -10,5 +10,3 @@ cp squid.conf /etc/squid/squid.conf
 cp tor.acl /etc/squid/tor.acl
 cp privoxy /etc/privoxy/config
 cp torrc /etc/tor/torrc
-
-chmod +x *.sh

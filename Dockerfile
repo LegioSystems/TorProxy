@@ -19,5 +19,6 @@ WORKDIR /app
 COPY --from=publish /app/publish .
 WORKDIR /
 COPY Configuration/ /configuration/
+RUN chmod +x /configuration/*.sh
 RUN /configuration/configure.sh
 ENTRYPOINT ./configuration/entry.sh

@@ -1,0 +1,20 @@
+forward-socks4a / 127.0.0.1:9050 .
+confdir /etc/privoxy
+logdir /var/log/privoxy
+actionsfile default.action.new
+actionsfile user.action.new
+filterfile default.filter.new
+
+logfile logfile
+
+debug 4096
+debug 8192
+
+user-manual /usr/share/doc/privoxy/user-manual
+listen-address 127.0.0.1:8118
+toggle 1
+enable-remote-toggle 0
+enable-edit-actions 0
+enable-remote-http-toggle 0
+accept-intercepted-requests 1
+buffer-limit 4096

@@ -1,0 +1,15 @@
+Log notice file /var/log/tor/notices.log
+RunAsDaemon 1
+PidFile /var/run/tor.pid
+CookieAuthentication 1
+ExitPolicy reject *:* # no exits allowed
+ExitPolicy reject6 *:* 
+
+UseBridges 1 
+#UpdateBridgesFromAuthority 1
+ClientTransportPlugin obfs4 exec /usr/bin/obfs4proxy 
+Bridge obfs4 35.86.70.175:443 EAFCDB15C9103A7E40B5153D8A4F9F63C45C5FF9 cert=byAah8nRMZO1pkuVSWOIKBTsI9NBA5Xj0T0lN6sEXAD1Kq9RnpuxFAsmcA9LdxGW38RcKw iat-mode=0
+Bridge obfs4 185.103.252.72:443 75F15E9339FF572F88F5588D429FEA379744BC53 cert=nOZ/SaRE3L1dChvjfe0Ks/wM/F8iFhwd3g2G5zgtcLB8x+wiZRWCwjRrbbiQyb3Gh2mxRQ iat-mode=0
+Bridge obfs4 141.95.75.30:33142 3EFE55584E1D0C23E11BC1931E12670303FE67EC cert=UVBaABip4lXJU0Vi7EzBriWRRSZ6nKE3C+D81r3ybPtrGULoXV8TxQ2iPm93aKvxsgutYg iat-mode=0
+Bridge obfs4 49.12.185.237:5829 32AE68578D8F5452F394048AC893F186D8A317A4 cert=Gck7bWVzPzjn507DaQ1lH6O5w7+WvmKSmmtNImV3u6Z6/yKz6T8V5mI+Qtzq5oKElTFodg iat-mode=0
+

@@ -1,0 +1,92 @@
+name: Docker
+
+on:
+  push:
+    branches: [ "master" ]
+
+env:
+  REGISTRY: ghcr.io
+  #HOST:CONTAINER
+  TEST_PORT_MAPPING: "-p 9130:3128 -p 9131:80"
+  PROD_PORT_MAPPING: "-p 9127:3128 -p 9129:80"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Docker buildx
+        uses: docker/setup-buildx-action@79abd3f86f79a9d68a23c75a09a9a85889262adf
+
+      - name: Log into registry ${{ env.REGISTRY }}
+        uses: docker/login-action@28218f9b04b4f3f62068d7b6ce6ca5b26e35336c
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}      
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository }}
+          tags: |
+            type=ref,event=branch
+            type=raw,value=latest,enable=${{ github.ref_name == 'master' }}
+
+      - name: Build and push Docker image
+        id: build-and-push
+        uses: docker/build-push-action@ac9327eae2b366085ac7f6a2d02df8aa8ead720a
+        with:
+          context: .
+          file: ./LegioSystems.TorProxy/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    runs-on: self-hosted
+    needs: build
+    steps:
+      - name: Prepare container configuration
+        run: |
+          image_name=${{ env.REGISTRY }}/${{ github.repository }}:${{ github.ref_name }}
+          echo "image_name=${image_name,,}" >> ${GITHUB_ENV}
+          container_name=${{ github.repository }}
+          container_name=${container_name##*/}
+          if [[ ${{ github.ref_name }} != 'master' ]]; then
+            container_name="${container_name}.test"
+            echo "port_mapping=${{ env.TEST_PORT_MAPPING }}" >> ${GITHUB_ENV}
+          else
+            echo "port_mapping=${{ env.PROD_PORT_MAPPING }}" >> ${GITHUB_ENV}
+            echo "restart_policy=--restart unless-stopped" >> ${GITHUB_ENV}
+          fi
+          echo "container_name=$container_name" >> ${GITHUB_ENV}
+          
+      - name: Log into registry ${{ env.REGISTRY }}
+        uses: docker/login-action@28218f9b04b4f3f62068d7b6ce6ca5b26e35336c
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Pull image from registry
+        run: |
+          echo ${{ env.image_name }}
+          docker pull ${{ env.image_name }}
+          
+      - name: Remove existing container
+        run: |
+          docker stop ${{ env.container_name }} || true
+          docker rm ${{ env.container_name }} || true
+          
+          
+      - name: Run container
+        run: |
+          docker run -d --name ${{ env.container_name }} ${{ env.port_mapping }} ${{ env.restart_policy }} ${{ env.image_name }}
+          
+    
